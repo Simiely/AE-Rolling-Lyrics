@@ -1,5 +1,41 @@
 # CHANGELOG.md · 变更记录
 
+## v3.7（2026-08-14）
+- **UI**：Lyrics_Ctrl 上的参数控件名改**中文显示**（最大字号 / 普通字号 / 间距 / 最大透明度 / 普通透明度 / 滚动帧数 / 停顿帧数），表达式同步引用中文名（中文版 AE 可用，与 starry-sky-generator 一致）
+- **新功能**：新增**停顿随机**开关 + **抖动帧数**控件——开启后每句实际停顿 = 停顿帧数 ± 抖动帧数（如 30±10 → 20~40 随机）；用 `seedRandom(idx+11000, true)` 确定性随机（每句固定、不闪烁），改控件实时生效
+- **结构**：滚动表达式从"等周期 T"改为"累积开始时间数组 times + 循环定位当前句"，支持每句不同停顿
+- 面板新增「停顿随机」复选框 +「抖动帧数」输入框；预设版本升至 v2（新增 pr / jit 短键，旧预设自动回退）
+- 测试新增 1 组（共 22 组）：停顿随机确定性随机验证
+
+## v3.6.1（2026-08-14）
+- **修复（真机报错 "undefined 不是对象" 第 372 行）**：效果容器访问从 `layer.effects` 改为 **`layer.property("ADBE Effect Parade")`**（`layer.effects` 在 AE 2026 真机取不到）
+- **修复**：添加 Slider Control 与取滑块参数改为**候选 fallback**（matchName / 中文「滑块」/ 英文「Slider」），兼容 AE 2026 中文版（依据 knowledge-base「AE2026中文版matchName兼容」+ starry-sky-generator 的 `addPropertySafe`/`getPropertySafe` 模式）
+- 新增 `SCRIPTS.util.addPropertySafe` / `getPropertySafe`；测试 mock 同步为 `property("ADBE Effect Parade")` 链路；21 组全绿
+
+## v3.6（2026-08-14）
+- **新功能（核心）**：7 个参数改为 **Slider Control 效果挂在 `Lyrics_Ctrl` 空对象**上，所有表达式改为引用控件（`effect(name)(1)`）——生成后选中空对象，直接在 AE 效果控件面板改数值即**实时生效**，无需重新生成、无需脚本参与（对齐 AE-Lyrics-Animator 等插件的控件化体验）
+- **重构**：滚动动画由关键帧改为 **`Lyrics_Ctrl` 位置表达式驱动**（按 time 循环"停留→滚动"，节奏引用 scrollFrames/pauseFrames/gap 控件），时间轴上不再有滚动关键帧
+- **撤销 v3.5 滑块方案**：面板参数恢复文本框填数字；移除 `updateLyrics` 与滑块相关 UI（用户反馈滑块不可见且不需要）
+- **保留**：超长句自动缩窄的放大上限以 `cap` 烘焙进缩放表达式（`ratio = min(maxS/norS, cap)`），AE 内调大字号也不会溢出画布
+- 测试 1/16/17/20/21 改为验证控件化（7 控件初值、表达式引用控件、无关键帧）；mock 增加效果系统模拟；21 组全绿
+
+## v3.5（2026-08-14，已撤销）
+- ~~参数滑块 UI + 脚本侧实时更新~~（用户确认撤销，改走 AE 控件方案）
+
+## v3.4（2026-08-14）
+- **重构**（行为不变，19 组测试全绿）：`buildLyrics` 拆分为职责单一的 6 个函数（`parseLyrics` / `computeOffsets` / `computeMaxDist` / `measureFit` / `createLyricLayer` / `buildController` / `attachExpressions`），主线变为编排，158 行 / CC24 → 83 行 / CC13
+- **重构**：SCRIPTS 命名空间按层分组 `util` / `preset` / `core` / `ui`，找代码不再靠名字猜
+- **重构**：面板 UI 构建抽为 `SCRIPTS.ui.buildUI()`，启动段 133 行 → 29 行
+- **重构**：表达式生成改数组 join（可读性提升，逻辑与输出完全一致）
+
+## v3.3（2026-08-14）
+- **修复**：图层起始时间真正归零——显式 `startTime = 0`（AE 新建图层默认跟随播放头，v3.2 仅删除旧设置并未真正归零，播放头不在 0 帧时前几秒无歌词）
+- **修复**：合成时长只延长不截断（合成里已有更长的背景内容时保持原时长）
+- **修复**：结尾时长修正——最后一句停留结束后再多停 1 秒（原逻辑多出 scrollFrames 的静止，默认参数下实际多停约 1.7s）
+- **优化**：超长句自动缩窄改用真实文本测量（`sourceRectAtTime`），不再用估算公式，字号更贴合实际渲染
+- **修复**：清理旧图层精确匹配 `Lyrics_Ctrl` / `Lyrics_Master`，不再误删用户自定义的 `Lyrics_*` 图层
+- 测试新增 2 组（共 19 组）：合成时长不截断、清理不误删用户图层
+
 ## v3.2（2026-08-14）
 - 两个空对象与滚动动画改回**从合成最开头（0 秒）生成**，不跟随播放指针（用户明确要求）
 - 移除 baseTime/startTime 播放头偏移逻辑
