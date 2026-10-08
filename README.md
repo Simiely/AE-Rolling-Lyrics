@@ -1,3 +1,12 @@
+> [!IMPORTANT]
+> ## 📦 本仓库已归档 —— 请到统一仓库下载
+> 本插件已并入 **[Simiely/ae-tools](https://github.com/Simiely/ae-tools)**（`panels/AE-Rolling-Lyrics/`），
+> 后续更新与问题修复都在 ae-tools 统一维护，**本仓库只读、不再更新**。
+>
+> 最新版源码：https://github.com/Simiely/ae-tools/tree/main/panels/AE-Rolling-Lyrics
+
+---
+
 # AE-Rolling-Lyrics · 滚动歌词生成器
 
 AE 2026 脚本（ExtendScript）：把整段歌词自动拆成逐句图层，做**卡拉 OK 式滚动歌词**——滚动到画面中心的一句放大 + 100% 透明度，未到中心保持普通字号 + 指定透明度，间距恒定。
